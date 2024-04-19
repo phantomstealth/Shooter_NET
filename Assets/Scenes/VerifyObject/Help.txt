@@ -1,0 +1,31 @@
+Network Transform (Unreliable) ClientToServer должно стоять
+т.к. Сервер является одновременно и клиентом
+
+Если в Command передается информация, то все внешние переменные должны быть 
+[SyncVar] public int health = 5;
+
+и SyncDirection должно стоять ClientToServer
+
+[Command]
+void Shoot()
+{
+    GameObject projectile = Instantiate(bullet, transform.position+new Vector3(horizontal*2,0,vertical*2), transform.rotation);
+    NetworkServer.Spawn(projectile);
+
+[ClientRpc]
+
+// уничтожить для всех на сервере
+[Server]
+void DestroySelf()
+{
+    NetworkServer.Destroy(gameObject);
+}
+
+// ServerCallback, потому что нам не нужно предупреждение
+// если OnTriggerEnter вызывается на клиенте
+[ServerCallback]
+void OnTriggerEnter(Collider co)
+{
+    Impact();
+    DestroySelf();
+}
